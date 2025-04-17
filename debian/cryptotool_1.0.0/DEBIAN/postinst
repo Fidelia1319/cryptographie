@@ -1,0 +1,4 @@
+#!/bin/sh
+# Post-installation script
+echo "CryptoTool installé avec succès!"
+echo "Les fichiers seront stockés dans ~/.cryptotool/"

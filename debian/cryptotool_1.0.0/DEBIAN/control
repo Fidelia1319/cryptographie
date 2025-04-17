@@ -1,0 +1,11 @@
+Package: cryptotool
+Version: 1.0.0
+Architecture: all
+Maintainer: Votre Nom <email@example.com>
+Depends: python3, openssl, python3-rich, python3-pyfiglet
+Description: Outil de cryptographie complet
+ Un outil performant pour les opérations cryptographiques incluant :
+ - Génération de clés RSA
+ - Chiffrement AES/3DES
+ - Signature numérique
+ 

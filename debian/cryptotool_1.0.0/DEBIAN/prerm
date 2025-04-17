@@ -1,0 +1,3 @@
+#!/bin/sh
+# Pre-removal script
+echo "Désinstallation de CryptoTool..."
