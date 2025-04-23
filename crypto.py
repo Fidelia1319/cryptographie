@@ -46,133 +46,250 @@ def executer_commande(cmd):
         console.print("[red]Erreur : fichier introuvable.[/red]")
 
 def gen_cle_pri():
-    console.print("\n[bold yellow]Génération de clé privée[/bold yellow]")
-    file_name = input("Nom de la clé privée : ")
-    cmd = f"openssl genpkey -algorithm RSA -out {file_name} -pkeyopt rsa_keygen_bits:2048"
-    executer_commande(cmd)
-    console.print(f"[green]{file_name} créé avec succès ![/green]")
+    try:
+        console.print("\n[bold yellow]Génération de clé privée[/bold yellow]")
+        file_name = input("Nom de la clé privée : ").strip()
+
+        if not file_name:
+            console.print("[red]Nom invalide.[/red]")
+            return
+
+        # Construction de la commande OpenSSL
+        cmd = f"openssl genpkey -algorithm RSA -out {file_name} -pkeyopt rsa_keygen_bits:2048"
+        executer_commande(cmd)
+
+        if fichier_existe(file_name):
+            console.print(f"[green]{file_name} créé avec succès ![/green]")
+        else:
+            console.print(f"[red]Échec de la création de {file_name}.[/red]")
+
+    except KeyboardInterrupt:
+        console.print("\n[red]Opération annulée par l'utilisateur.[/red]")
+    except Exception as e:
+        console.print(f"[red]Une erreur est survenue : {e}[/red]")
 
 def chif_cle():
-    console.print("\n[bold yellow]Chiffrement de clé privée[/bold yellow]")
-    file_in = input("Nom de la clé à chiffrer : ")
-    if not fichier_existe(file_in):
-        return console.print("[red]Fichier introuvable.[/red]")
-    file_out = input("Nom du fichier chiffré en sortie : ")
-    algo = input("Algorithme (aes256, des3) : ").lower()
+    try:
+        console.print("\n[bold yellow]Chiffrement de clé privée[/bold yellow]")
+        
+        file_in = input("Nom de la clé à chiffrer : ").strip()
+        if not fichier_existe(file_in):
+            console.print("[red]Fichier introuvable.[/red]")
+            return
 
-    cmd = f"openssl pkey -in {file_in} -{algo} -out {file_out}"
-    executer_commande(cmd)
-    console.print("[green]Clé chiffrée avec succès.[/green]")
+        file_out = input("Nom du clé chiffré en sortie : ").strip()
+        if not file_out:
+            console.print("[red]Nom de la clé invalide.[/red]")
+            return
+
+        algo = input("Algorithme (aes256, des3) : ").lower().strip()
+        if algo not in ["aes256", "des3"]:
+            console.print("[red]Algorithme non supporté. Utilisez aes256 ou des3.[/red]")
+            return
+
+        cmd = f"openssl pkey -in {file_in} -{algo} -out {file_out}"
+        executer_commande(cmd)
+
+        if fichier_existe(file_out):
+            console.print("[green]Clé chiffrée avec succès![/green]")
+        else:
+            console.print("[red]Échec du chiffrement.[/red]")
+
+    except KeyboardInterrupt:
+        console.print("\n[red]Opération annulée par l'utilisateur.[/red]")
+    except Exception as e:
+        console.print(f"[red]Erreur inattendue : {e}[/red]")
 
 def gen_cle_pub():
-    console.print("\n[bold yellow]Génération de clé publique[/bold yellow]")
-    file_in = input("Clé privée : ")
-    if not fichier_existe(file_in):
-        return console.print("[red]Clé privée introuvable.[/red]")
-    file_out = input("Nom de la clé publique : ")
+    try:
+        console.print("\n[bold yellow]Génération de clé public[/bold yellow]")
+        file_in = input("Entrer la clé privé : ").strip()
 
-    cmd = f"openssl pkey -in {file_in} -pubout -out {file_out}"
-    executer_commande(cmd)
-    console.print("[green]Clé publique générée avec succès.[/green]")
+        if not fichier_existe(file_in):
+            console.print("[red]Clé privée introuvable.[/red]")
+            return
+        
+        file_out = input("Nom de la clé publique : ").strip()
+
+        if not file_in:
+            console.print("[red]Nom invalide.[/red]")
+            return
+        
+        # Construction de la commande OpenSSL
+        cmd = f"openssl pkey -in {file_in} -pubout -out {file_out}"
+        executer_commande(cmd)
+
+        if fichier_existe(file_in):
+            console.print(f"[green]{file_in} créé avec succès![/green]")
+        else:
+            console.print(f"[red]Échec de la création du fichier {file_in}.[/red]")
+
+    except KeyboardInterrupt:
+        console.print("\n[red]Opération annulée par l'utilisateur.[/red]")
+    except Exception as e:
+        console.print(f"[red]Une erreur est survenue : {e}[/red]")
 
 def chif_d():
-    console.print("\n[bold yellow]Chiffrement de données[/bold yellow]")
-    file_in = input("Fichier à chiffrer : ")
-    if not fichier_existe(file_in):
-        return console.print("[red]Fichier introuvable.[/red]")
-    file_out = input("Nom du fichier chiffré : ")
-    #algo = input("Algorithme (rsa, aes-256-cbc, des-ede3-cbc) : ").lower()
-    algo = input("algorithme (RSA, AES-256, 3-DES) : ").upper()
+    try:
+        console.print("\n[bold yellow]Chiffrement de données[/bold yellow]")
+        file_in = input("Etrer le fichier à chiffrer : ").strip()
 
-    if algo == "RSA":
-        cle_priv = input("Clé privé pour le chiffrement : ")
-        if not fichier_existe(cle_priv):
-            return console.print("[red]Clé privé introuvable.[/red]")
+        if not fichier_existe(file_in):
+            console.print("[red]Fichier introuvable.[/red]")
+            return
+        
+        file_out = input("Nom du fichier chiffré : ").strip()
 
-        cmd = f"openssl pkeyutl -encrypt -in {file_in} -pubin -inkey {cle_priv} -out {file_out}"
-    #elif algo in ["aes-256-cbc", "des-ede3-cbc"]:
-    elif algo in ["AES-256", "3-DES"]:
-        if algo == "AES-256":
-            cmd = f"openssl enc -aes-256-cbc -pbkdf2 -in {file_in} -out {file_out}"
-        elif algo == "3-DES":
-            cmd = f"openssl enc -des-ede3-cbc -pbkdf2 -in {file_in} -out {file_out}"
-        #cmd = f"openssl enc -{algo} -pbkdf2 -in {file_in} -out {file_out}"
-    else:
-        console.print("[red]Algorithme non supporté.[/red]")
-        return
+        if not file_out:
+            console.print("[red]Nom du fichier invalide.[/red]")
+            return
+        
+        algo = input("algorithme de chiffrement (aes256, des3) ou clé de chiffrement (cle) : ").lower().strip()
 
-    executer_commande(cmd)
-    console.print("[green]Données chiffrées avec succès.[/green]")
+        if algo == "cle":
+            cle_priv = input("Etrer la clé privé pour le chiffrement : ")
+            if not fichier_existe(cle_priv):
+                return console.print("[red]Clé privé introuvable.[/red]")
+
+            cmd = f"openssl pkeyutl -encrypt -in {file_in} -inkey {cle_priv} -out {file_out}"
+
+        elif algo in ["aes256", "des3"]:
+            if algo == "aes256":
+                cmd = f"openssl enc -aes-256-cbc -pbkdf2 -in {file_in} -out {file_out}"
+            elif algo == "des3":
+                cmd = f"openssl enc -des-ede3-cbc -pbkdf2 -in {file_in} -out {file_out}"
+        else:
+            console.print("[red]Algorithme non supporté.[/red]")
+            return
+
+        executer_commande(cmd)
+        console.print("[green]Données chiffrées avec succès![/green]")
+
+    except KeyboardInterrupt:
+        console.print("\n[red]Opération annulée par l'utilisateur.[/red]")
+    except Exception as e:
+        console.print(f"[red]Erreur inattendue : {e}[/red]") 
 
 def dechif_d():
-    console.print("\n[bold yellow]Déchiffrement de données[/bold yellow]")
-    file_in = input("Fichier à déchiffré : ")
-    if not fichier_existe(file_in):
-        return console.print("[red]Fichier introuvable.[/red]")
-    file_out = input("Nom du fichier déchiffré : ")
-    #algo = input("Algorithme (rsa, aes-256-cbc, des-ede3-cbc) : ").lower()
-    algo = input("algorithme (RSA, AES-256, 3-DES) : ").upper()
-    
-    if algo == "RSA":
-        cle_priv = input("Clé privée pour le déchiffrement : ")
-        if not fichier_existe(cle_priv):
-            return console.print("[red]Clé privée introuvable.[/red]")
+    try:
+        console.print("\n[bold yellow]Déchiffrement de données[/bold yellow]")
+        file_in = input("Entrer le fichier à déchiffré : ")
+        if not fichier_existe(file_in):
+            return console.print("[red]Fichier introuvable.[/red]")
+        
+        file_out = input("Nom du fichier déchiffré : ").strip()
+        if not file_out:
+            console.print("[red]Nom du fichier invalide.[/red]")
+            return
+        
+        algo = input("algorithme de dechiffrement (aes256, des3) ou clé de dechiffrement (cle) : ").lower().strip()
 
-        cmd = f"openssl pkeyutl -decrypt -in {file_in} -inkey {cle_priv} -out {file_out}"
-    #elif algo in ["aes-256-cbc", "des-ede3-cbc"]:
-    elif algo in ["AES-256", "3-DES"]:
-        if algo == "AES-256":
-            cmd = f"openssl enc -d -aes-256-cbc -pbkdf2 -in {file_in} -out {file_out}"
-        elif algo == "3-DES":
-            cmd = f"openssl enc -d -des-ede3-cbc -pbkdf2 -in {file_in} -out {file_out}"
-        #cmd = f"openssl enc -d -{algo} -pbkdf2 -in {file_in} -out {file_out}"
-    else:
-        console.print("[red]Algorithme non supporté.[/red]")
-        return
+        if algo == "cle":
+            cle_priv = input("Entrer la clé privé pour le dechiffrement : ")
+            if not fichier_existe(cle_priv):
+                return console.print("[red]Clé privé introuvable.[/red]")
 
-    executer_commande(cmd)
-    console.print("[green]Données déchiffrées avec succès.[/green]")
+            cmd = f"openssl pkeyutl -decrypt -in {file_in} -inkey {cle_priv} -out {file_out}"
+
+        elif algo in ["aes256", "des3"]:
+            if algo == "aes256":
+                cmd = f"openssl enc -d -aes-256-cbc -pbkdf2 -in {file_in} -out {file_out}"
+            elif algo == "des3":
+                cmd = f"openssl enc -d -des-ede3-cbc -pbkdf2 -in {file_in} -out {file_out}"
+        else:
+            console.print("[red]Algorithme non supporté.[/red]")
+            return
+
+        executer_commande(cmd)
+        console.print("[green]Données déchiffrées avec succès![/green]")
+
+    except KeyboardInterrupt:
+        console.print("\n[red]Opération annulée par l'utilisateur.[/red]")
+    except Exception as e:
+        console.print(f"[red]Erreur inattendue : {e}[/red]") 
 
 def cal_em():
-    console.print("\n[bold yellow]Calcul d'empreinte[/bold yellow]")
-    algo = input("Fonction de hashage (md5, sha256, ...) : ")
-    file_in = input("Fichier source : ")
-    if not fichier_existe(file_in):
-        return console.print("[red]Fichier introuvable.[/red]")
-    empreinte = input("Nom du fichier de sortie de l'empreinte : ")
+    try:
+        console.print("\n[bold yellow]Calcul d'empreinte[/bold yellow]")
+        algo = input("Entrer une fonction de hashage (md5, sha256, ...) : ").lower().strip()
 
-    cmd = f"openssl dgst -{algo} -out {empreinte} {file_in}"
-    executer_commande(cmd)
-    console.print("[green]Empreinte générée avec succès.[/green]")
+        file_in = input("Entrer le fichier à hacher : ").strip()
+        if not fichier_existe(file_in):
+            return console.print("[red]Fichier introuvable.[/red]")
+        
+        empreinte = input("Etrer le nom de l'empreinte : ").strip()
+        if not empreinte:
+            console.print("[red]Nom de l'empreinte invalide.[/red]")
+            return
+        
+        if algo in ["md5", "sha256"]:
+            cmd = f"openssl dgst -{algo} -out {empreinte} {file_in}"
+
+            executer_commande(cmd)
+            console.print("[green]Empreinte générée avec succès![/green]")
+        
+        else:
+            console.print("[green]Algorythme introuvable.[/green]")
+            return
+
+    except KeyboardInterrupt:
+        console.print("\n[red]Opération annulée par l'utilisateur.[/red]")
+    except Exception as e:
+        console.print(f"[red]Erreur inattendue : {e}[/red]")
 
 def sign_em():
-    console.print("\n[bold yellow]Signature d'empreinte[/bold yellow]")
-    file_in = input("Fichier à signer : ")
-    if not fichier_existe(file_in):
-        return console.print("[red]Fichier introuvable.[/red]")
-    cle_pri = input("Clé privée : ")
-    if not fichier_existe(cle_pri):
-        return console.print("[red]Clé privée introuvable.[/red]")
-    sig_out = input("Nom du fichier signature : ")
+    try:
+        console.print("\n[bold yellow]Signature d'empreinte[/bold yellow]")
+        file_in = input("Entrer l'empreinte à signer : ").strip()
+        if not fichier_existe(file_in):
+            return console.print("[red]Empreinte introuvable.[/red]")
+        
+        cle_pri = input("Entrer la clé privée : ").strip()
+        if not fichier_existe(cle_pri):
+            return console.print("[red]Clé privée introuvable.[/red]")
+        
+        sig_out = input("Etrer le nom de la signature : ").strip()
+        if not sig_out:
+            console.print("[red]Nom de la signature invalide.[/red]")
+            return
+        
+        cmd = f"openssl pkeyutl -sign -in {file_in} -inkey {cle_pri} -out {sig_out}"
+        
+        executer_commande(cmd)
+        console.print("[green]Signature créée avec succès![/green]")
 
-    cmd = f"openssl dgst -sha256 -sign {cle_pri} -out {sig_out} {file_in}"
-    executer_commande(cmd)
-    console.print("[green]Signature créée avec succès.[/green]")
+    except KeyboardInterrupt:
+        console.print("\n[red]Opération annulée par l'utilisateur.[/red]")
+    except Exception as e:
+        console.print(f"[red]Erreur inattendue : {e}[/red]")
 
 def ver_sign():
-    console.print("\n[bold yellow]Vérification de signature[/bold yellow]")
-    file = input("Fichier original (empreinte) : ")
-    if not fichier_existe(file):
-        return console.print("[red]Fichier original introuvable.[/red]")
-    signature = input("Fichier de signature : ")
-    if not fichier_existe(signature):
-        return console.print("[red]Fichier de signature introuvable.[/red]")
-    cle_pub = input("Clé publique : ")
-    if not fichier_existe(cle_pub):
-        return console.print("[red]Clé publique introuvable.[/red]")
+    try:
+        console.print("\n[bold yellow]Vérification de signature[/bold yellow]")
+        file_out = input("Entrer l nom de l'empreinte : ").strip()
+        if fichier_existe(file_out):
+            console.print("[red]Nom d'empreinte déjà existante.[/red]")
+            return
+        elif not file_out:
+            return console.print("[red]Nom de l'empreinte invalide.[/red]")
+        
+        signature = input("Entrer la signature : ").strip()
+        if not fichier_existe(signature):
+            return console.print("[red]Signature introuvable.[/red]")
+        
+        cle_pub = input("Entrer la clé publique : ").strip()
+        if not fichier_existe(cle_pub):
+            return console.print("[red]Clé publique introuvable.[/red]")
 
-    cmd = f"openssl dgst -sha256 -verify {cle_pub} -signature {signature} {file}"
-    executer_commande(cmd)
+        cmd = f"openssl rsautl -verify -in {signature} -pubin -inkey {cle_pub} -out {file_out}"
+        executer_commande(cmd)
+
+        console.print(f"[green]{file_out} crée![/green]")
+
+    except KeyboardInterrupt:
+        console.print("\n[red]Opération annulée par l'utilisateur.[/red]")
+    except Exception as e:
+        console.print(f"[red]Erreur inattendue : {e}[/red]")
 
 def main():
     try:
