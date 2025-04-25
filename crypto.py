@@ -25,7 +25,7 @@ def afficher_menu():
         ("3", "Génération de clé publique (RSA)"),
         ("4", "Chiffrement de données (RSA/AES/3DES)"),
         ("5", "Déchiffrement de données (RSA/AES/3DES)"),
-        ("6", "Calcul d'empreinte (MD5/SHA256)"),
+        ("6", "Calcul d'empreinte (MD5)"),
         ("7", "Signature d'empreinte (RSA)"),
         ("8", "Vérification de signature (RSA)"),
         ("99", "Quitter"),
@@ -211,7 +211,7 @@ def dechif_d():
 def cal_em():
     try:
         console.print("\n[bold yellow]Calcul d'empreinte[/bold yellow]")
-        algo = input("Entrer une fonction de hashage (md5, sha256, ...) : ").lower().strip()
+        algo = input("Entrer une fonction de hashage (md5) : ").lower().strip()
 
         file_in = input("Entrer le fichier à hacher : ").strip()
         if not fichier_existe(file_in):
@@ -266,7 +266,7 @@ def sign_em():
 def ver_sign():
     try:
         console.print("\n[bold yellow]Vérification de signature[/bold yellow]")
-        file_out = input("Entrer l nom de l'empreinte : ").strip()
+        file_out = input("Entrer le nom de l'empreinte : ").strip()
         if fichier_existe(file_out):
             console.print("[red]Nom d'empreinte déjà existante.[/red]")
             return
