@@ -1,4 +1,18 @@
-# cryptographie
+# 🔐 Cryptographie — Projet L3 SR (Python)
 
-## Avadika package python ao amny "https://pypi.org/" (soit installable via pip install ... ) na avadika outil sous linux.
-## De le code ameliorena si besoin , ataovy push fotsiny de zah manao merge.
+Petit outil en **Python** pour **chiffrer** et **déchiffrer** du texte ou des fichiers.
+
+## Installation
+```bash
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# macOS/Linux
+# source .venv/bin/activate
+pip install -r requirements.txt  # (si présent)
+
+Auteurs
+
+Fidelia Andrianantenaintsoa
+TSAROVANA Mahery
+ALPHA Princy
